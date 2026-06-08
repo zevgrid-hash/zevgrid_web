@@ -108,12 +108,12 @@
 // }
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Zap } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { businessSignup } from "../../lib/api";
 
 import {
   ELECTRIC_CYAN,
@@ -128,18 +128,49 @@ export default function BusinessSignup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     company: "", contact: "", mobile: "", email: "",
-    city: "Pune", businessType: "logistics", count: "", gst: "",
+    password: "", city: "Pune", businessType: "logistics", count: "", gst: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const update = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!form.company || !form.mobile || !form.email) {
-      toast.error("Company, mobile and email are required.");
+    if (!form.company || !form.mobile || !form.email || !form.password) {
+      toast.error("Company, mobile, email and password are required.");
       return;
     }
-    toast.success("Account created", { description: "You can now request quotes and unlock dealer contact." });
-    navigate("/search");
+
+    setIsSubmitting(true);
+    try {
+      const payload = await businessSignup({
+        email: form.email.trim(),
+        passwordHash: form.password,
+        company: form.company.trim(),
+        contact: form.contact.trim(),
+        mobile: form.mobile.trim(),
+        city: form.city,
+        businessType: form.businessType,
+        gst: form.gst.trim(),
+      });
+
+      if (payload?.success === false) {
+        throw new Error(payload?.message || "Business signup failed.");
+      }
+
+      const signupData = payload?.data ?? payload;
+      localStorage.setItem("zevgrid_business_signup", JSON.stringify(signupData));
+
+      toast.success(payload?.message || "Account created", {
+        description: "You can now request quotes and unlock dealer contact.",
+      });
+      navigate("/search");
+    } catch (error) {
+      toast.error("Business signup failed", {
+        description: error.message || "Please check the details and try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Map constants to CSS variables for clean Tailwind integration
@@ -171,26 +202,32 @@ export default function BusinessSignup() {
       <form onSubmit={submit} className="mt-8 space-y-5 rounded-xl border border-[var(--charcoal-light)] bg-[var(--white)] p-6">
         <div>
           <Label htmlFor="company">Company name *</Label>
-          <Input id="company" data-testid="biz-signup-company" value={form.company} onChange={(e) => update("company", e.target.value)} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+          <Input id="company" data-testid="biz-signup-company" value={form.company} onChange={(e) => update("company", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="contact">Contact person</Label>
-            <Input id="contact" data-testid="biz-signup-contact" value={form.contact} onChange={(e) => update("contact", e.target.value)} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+            <Input id="contact" data-testid="biz-signup-contact" value={form.contact} onChange={(e) => update("contact", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
           </div>
           <div>
             <Label htmlFor="mobile">Mobile *</Label>
-            <Input id="mobile" data-testid="biz-signup-mobile" type="tel" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+            <Input id="mobile" data-testid="biz-signup-mobile" type="tel" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
           </div>
         </div>
-        <div>
-          <Label htmlFor="email">Work email *</Label>
-          <Input id="email" data-testid="biz-signup-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="email">Work email *</Label>
+            <Input id="email" data-testid="biz-signup-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+          </div>
+          <div>
+            <Label htmlFor="password">Password *</Label>
+            <Input id="password" data-testid="biz-signup-password" type="password" value={form.password} onChange={(e) => update("password", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label>City</Label>
-            <Select value={form.city} onValueChange={(v) => update("city", v)}>
+            <Select value={form.city} onValueChange={(v) => update("city", v)} disabled={isSubmitting}>
               <SelectTrigger className="mt-1.5 h-11 border-[var(--charcoal-light)] focus:ring-[var(--cyan)]" data-testid="biz-signup-city"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Pune">Pune</SelectItem>
@@ -200,7 +237,7 @@ export default function BusinessSignup() {
           </div>
           <div>
             <Label>Business type</Label>
-            <Select value={form.businessType} onValueChange={(v) => update("businessType", v)}>
+            <Select value={form.businessType} onValueChange={(v) => update("businessType", v)} disabled={isSubmitting}>
               <SelectTrigger className="mt-1.5 h-11 border-[var(--charcoal-light)] focus:ring-[var(--cyan)]" data-testid="biz-signup-type"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="logistics">Logistics / last-mile</SelectItem>
@@ -215,16 +252,16 @@ export default function BusinessSignup() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="count">Fleet size needed</Label>
-            <Input id="count" data-testid="biz-signup-count" type="number" value={form.count} onChange={(e) => update("count", e.target.value)} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+            <Input id="count" data-testid="biz-signup-count" type="number" value={form.count} onChange={(e) => update("count", e.target.value)} disabled={isSubmitting} className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
           </div>
           <div>
             <Label htmlFor="gst">GST no. (optional)</Label>
-            <Input id="gst" data-testid="biz-signup-gst" value={form.gst} onChange={(e) => update("gst", e.target.value)} placeholder="Required before booking" className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
+            <Input id="gst" data-testid="biz-signup-gst" value={form.gst} onChange={(e) => update("gst", e.target.value)} disabled={isSubmitting} placeholder="Required before booking" className="mt-1.5 h-11 border-[var(--charcoal-light)] focus-visible:ring-[var(--cyan)]" />
           </div>
         </div>
 
-        <Button type="submit" data-testid="biz-signup-submit" className="h-12 w-full rounded-md bg-[var(--cyan)] text-[var(--navy)] text-sm font-bold hover:opacity-90 transition-opacity">
-          Create account
+        <Button type="submit" disabled={isSubmitting} data-testid="biz-signup-submit" className="h-12 w-full rounded-md bg-[var(--cyan)] text-[var(--navy)] text-sm font-bold hover:opacity-90 transition-opacity disabled:cursor-not-allowed disabled:opacity-70">
+          {isSubmitting ? "Creating account..." : "Create account"}
         </Button>
         <p className="text-center text-sm text-[var(--charcoal-muted)]">
           Already have an account?{" "}

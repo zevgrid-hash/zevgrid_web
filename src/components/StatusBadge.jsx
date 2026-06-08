@@ -1,46 +1,4 @@
-// import { cn } from "../lib/utils";
 
-// const map = {
-//   available: "bg-emerald-50 text-emerald-700 border-emerald-200",
-//   approved: "bg-emerald-50 text-emerald-700 border-emerald-200",
-//   live: "bg-emerald-50 text-emerald-700 border-emerald-200",
-//   converted: "bg-emerald-50 text-emerald-700 border-emerald-200",
-
-//   pending: "bg-amber-50 text-amber-700 border-amber-200",
-//   draft: "bg-slate-50 text-slate-700 border-slate-200",
-//   reserved: "bg-amber-50 text-amber-700 border-amber-200",
-//   quoted: "bg-amber-50 text-amber-700 border-amber-200",
-//   negotiation: "bg-orange-50 text-orange-700 border-orange-200",
-
-//   rejected: "bg-rose-50 text-rose-700 border-rose-200",
-//   lost: "bg-rose-50 text-rose-700 border-rose-200",
-//   suspended: "bg-rose-50 text-rose-700 border-rose-200",
-//   inactive: "bg-slate-100 text-slate-600 border-slate-200",
-//   unavailable: "bg-rose-50 text-rose-700 border-rose-200",
-//   rented: "bg-slate-900 text-white border-slate-900",
-
-//   new: "bg-blue-50 text-blue-700 border-blue-200",
-//   contacted: "bg-sky-50 text-sky-700 border-sky-200",
-//   qualified: "bg-indigo-50 text-indigo-700 border-indigo-200",
-// };
-
-// export const StatusBadge = ({ status, className }) => {
-//   const style = map[status?.toLowerCase()] || "bg-slate-100 text-slate-700 border-slate-200";
-//   return (
-//     <span
-//       data-testid={`status-badge-${status}`}
-//       className={cn(
-//         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em]",
-//         style,
-//         className
-//       )}
-//     >
-//       {status}
-//     </span>
-//   );
-// };
-
-// export default StatusBadge;
 import { cn } from "../lib/utils";
 import {
   ACTIVE_EMERALD,

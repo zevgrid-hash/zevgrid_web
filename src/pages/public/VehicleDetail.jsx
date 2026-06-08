@@ -224,13 +224,15 @@
 //     </div>
 //   );
 // }
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Battery, Zap, Calendar, MapPin, Shield, Lock, FileCheck, Package, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StatusBadge from "../../components/StatusBadge";
 import { VEHICLES } from "../../data/mockData";
 import { toast } from "sonner";
+import { getVehicleById } from "../../lib/api";
 
 import {
   ELECTRIC_CYAN,
@@ -243,7 +245,25 @@ import {
 export default function VehicleDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const vehicle = VEHICLES.find((v) => v.id === id) || VEHICLES[0];
+  const [vehicle, setVehicle] = useState(() => VEHICLES.find((v) => v.id === id) || VEHICLES[0]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadVehicle() {
+      try {
+        const result = await getVehicleById(id);
+        if (!ignore) setVehicle(result.data);
+      } catch {
+        // Keep the local fallback so the route remains usable if the API is unavailable.
+      }
+    }
+
+    loadVehicle();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
 
   const handleGated = (action) => {
     toast.info(`Sign up to ${action}`, {

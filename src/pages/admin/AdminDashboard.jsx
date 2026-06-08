@@ -1,104 +1,10 @@
-// import { Link } from "react-router-dom";
-// import { UserCheck, CarFront, Inbox, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
-// import StatusBadge from "../../components/StatusBadge";
-// import { STATS, DEALERS, LEADS, VEHICLES, LEAD_STAGES } from "../../data/mockData";
 
-// const Metric = ({ icon: Icon, label, value, sub, link }) => (
-//   <Link to={link} className="group rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-sm">
-//     <div className="flex items-center justify-between">
-//       <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
-//         <Icon className="h-4 w-4" />
-//       </span>
-//       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{sub}</span>
-//     </div>
-//     <p className="mt-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">{label}</p>
-//     <p className="mt-1 font-display text-3xl font-bold">{value}</p>
-//   </Link>
-// );
-
-// export default function AdminDashboard() {
-//   const pendingDealers = DEALERS.filter((d) => d.status === "pending");
-//   const pendingVehicles = VEHICLES.filter((v) => v.status === "pending");
-//   const pipeline = LEAD_STAGES.map((s) => ({
-//     ...s,
-//     count: LEADS.filter((l) => l.stage === s.key).length,
-//   }));
-
-//   return (
-//     <div data-testid="admin-dashboard" className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-//       <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">Ops overview</p>
-//       <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Marketplace control room</h1>
-
-//       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-//         <Metric icon={UserCheck} label="Pending dealers" value={STATS.admin.dealersPending} sub="Review" link="/admin/dealer-approvals" />
-//         <Metric icon={CarFront} label="Pending listings" value={STATS.admin.listingsPending} sub="Approve" link="/admin/vehicle-approvals" />
-//         <Metric icon={Inbox} label="New leads" value={STATS.admin.leadsNew} sub="Qualify" link="/admin/leads" />
-//         <Metric icon={TrendingUp} label="Converted (MTD)" value={STATS.admin.leadsConverted} sub={STATS.admin.revenueMTD} link="/admin/leads" />
-//       </div>
-
-//       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-//         <section className="rounded-xl border border-slate-200 bg-white p-5">
-//           <div className="flex items-center justify-between">
-//             <h2 className="font-display text-lg font-bold">Pending dealer approvals</h2>
-//             <Link to="/admin/dealer-approvals" className="text-xs font-bold text-emerald-700 hover:underline" data-testid="admin-see-dealers">
-//               Open queue →
-//             </Link>
-//           </div>
-//           <div className="mt-4 space-y-3">
-//             {pendingDealers.map((d) => (
-//               <div key={d.id} data-testid={`admin-pending-dealer-${d.id}`} className="flex items-center justify-between rounded-md border border-slate-100 p-3">
-//                 <div>
-//                   <p className="text-sm font-semibold">{d.dealership}</p>
-//                   <p className="text-xs text-slate-500">{d.contact} · {d.city} · {d.docs.length} docs</p>
-//                 </div>
-//                 <Clock className="h-4 w-4 text-amber-600" />
-//               </div>
-//             ))}
-//             {pendingDealers.length === 0 && <p className="text-sm text-slate-500">No pending dealers.</p>}
-//           </div>
-//         </section>
-
-//         <section className="rounded-xl border border-slate-200 bg-white p-5">
-//           <div className="flex items-center justify-between">
-//             <h2 className="font-display text-lg font-bold">Listings awaiting review</h2>
-//             <Link to="/admin/vehicle-approvals" className="text-xs font-bold text-emerald-700 hover:underline" data-testid="admin-see-vehicles">
-//               Open queue →
-//             </Link>
-//           </div>
-//           <div className="mt-4 space-y-3">
-//             {pendingVehicles.map((v) => (
-//               <div key={v.id} data-testid={`admin-pending-vehicle-${v.id}`} className="flex items-center gap-3 rounded-md border border-slate-100 p-3">
-//                 <img src={v.image} alt="" className="h-12 w-12 rounded object-cover" />
-//                 <div className="min-w-0 flex-1">
-//                   <p className="truncate text-sm font-semibold">{v.brand} {v.model}</p>
-//                   <p className="text-xs text-slate-500">{v.type} · ₹{v.monthlyRent.toLocaleString("en-IN")}/mo · {v.photos} photos</p>
-//                 </div>
-//                 <Clock className="h-4 w-4 text-amber-600" />
-//               </div>
-//             ))}
-//             {pendingVehicles.length === 0 && <p className="text-sm text-slate-500">No pending listings.</p>}
-//           </div>
-//         </section>
-//       </div>
-
-//       <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
-//         <h2 className="font-display text-lg font-bold">Lead pipeline</h2>
-//         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-//           {pipeline.map((s) => (
-//             <div key={s.key} data-testid={`pipeline-${s.key}`} className="rounded-md border border-slate-100 bg-slate-50 p-3">
-//               <StatusBadge status={s.key} />
-//               <p className="mt-3 font-display text-2xl font-bold">{s.count}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     </div>
-//   );
-// }
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { UserCheck, CarFront, Inbox, TrendingUp, Clock } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
-import { STATS, DEALERS, LEADS, VEHICLES, LEAD_STAGES } from "../../data/mockData";
+import { STATS, LEADS, VEHICLES, LEAD_STAGES } from "../../data/mockData";
+import { getAdminStats, getDealers, getVehicles } from "../../lib/api";
 import {
   ELECTRIC_CYAN,
   ENTERPRISE_CHARCOAL,
@@ -188,13 +94,75 @@ const Metric = ({ icon: Icon, label, value, sub, link }) => (
 );
 
 export default function AdminDashboard() {
-  const pendingDealers = DEALERS.filter((d) => d.status === "pending");
-  const pendingVehicles = VEHICLES.filter((v) => v.status === "pending");
+  const [adminStats, setAdminStats] = useState(null);
+  const [statsError, setStatsError] = useState("");
+  const [pendingDealers, setPendingDealers] = useState([]);
+  const [pendingDealersError, setPendingDealersError] = useState("");
+  // const pendingVehicles = VEHICLES.filter((v) => v.status === "pending");
+  
   const pipeline = LEAD_STAGES.map((s) => ({
     ...s,
     count: LEADS.filter((l) => l.stage === s.key).length,
   }));
 
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadStats() {
+      try {
+        const [statsResult, dealersResult] = await Promise.all([
+          getAdminStats(),
+          getDealers({ status: "pending" }),
+        ]);
+        if (!ignore) {
+          setAdminStats(statsResult.data);
+          setPendingDealers(dealersResult.data);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setStatsError(error.message || "Admin stats could not be loaded.");
+          setPendingDealersError(error.message || "Pending dealers could not be loaded.");
+        }
+      }
+    }
+
+    loadStats();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+    const [list, setList] = useState([]);
+ 
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+ 
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadListings() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getVehicles({
+          status: "pending"
+        });
+        if (!ignore) setList(result.data);
+        console.log(result.data)
+      } catch (error) {
+        if (!ignore) {
+          setList([]);
+          setLoadError(error.message || "Listings could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadListings();
+    return () => {
+      ignore = true;
+    };
+  }, []);
   const sectionStyle = {
     borderRadius: "0.75rem",
     border: "1px solid #E2E8F0",
@@ -281,11 +249,14 @@ export default function AdminDashboard() {
         }}
         className="md:grid-cols-4"
       >
-        <Metric icon={UserCheck} label="Pending dealers" value={STATS.admin.dealersPending} sub="Review" link="/admin/dealer-approvals" />
-        <Metric icon={CarFront} label="Pending listings" value={STATS.admin.listingsPending} sub="Approve" link="/admin/vehicle-approvals" />
-        <Metric icon={Inbox} label="New leads" value={STATS.admin.leadsNew} sub="Qualify" link="/admin/leads" />
-        <Metric icon={TrendingUp} label="Converted (MTD)" value={STATS.admin.leadsConverted} sub={STATS.admin.revenueMTD} link="/admin/leads" />
+        <Metric icon={UserCheck} label="Pending dealers" value={adminStats?.dealers.pending ?? STATS.admin.dealersPending} sub="Review" link="/admin/dealer-approvals" />
+        <Metric icon={CarFront} label="Pending listings" value={adminStats?.vehicles.pending ?? STATS.admin.listingsPending} sub="Approve" link="/admin/vehicle-approvals" />
+        <Metric icon={Inbox} label="New leads" value={adminStats?.leads.new ?? STATS.admin.leadsNew} sub="Qualify" link="/admin/leads" />
+        <Metric icon={TrendingUp} label="Businesses" value={adminStats?.businesses.total ?? STATS.admin.leadsConverted} sub="Accounts" link="/admin/businesses" />
       </div>
+      {statsError && (
+        <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "#64748B" }}>{statsError}</p>
+      )}
 
       {/* Two-column sections */}
       <div
@@ -317,13 +288,16 @@ export default function AdminDashboard() {
                 <div>
                   <p style={{ fontSize: "0.875rem", fontWeight: 600, color: ENTERPRISE_CHARCOAL }}>{d.dealership}</p>
                   <p style={labelSmStyle}>
-                    {d.contact} · {d.city} · {d.docs.length} docs
+                    {d.contact} · {d.city} · {d.mobile}
                   </p>
                 </div>
                 <Clock style={{ height: "1rem", width: "1rem", color: WARNING_AMBER }} />
               </div>
             ))}
-            {pendingDealers.length === 0 && (
+            {pendingDealersError && (
+              <p style={labelSmStyle}>{pendingDealersError}</p>
+            )}
+            {!pendingDealersError && pendingDealers.length === 0 && (
               <p style={labelSmStyle}>No pending dealers.</p>
             )}
           </div>
@@ -344,7 +318,7 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {pendingVehicles.map((v) => (
+            {list.map((v) => (
               <div key={v.id} data-testid={`admin-pending-vehicle-${v.id}`} style={{ ...rowStyle, justifyContent: "flex-start", gap: "0.75rem" }}>
                 <img src={v.image} alt="" style={{ height: "3rem", width: "3rem", borderRadius: "0.375rem", objectFit: "cover" }} />
                 <div style={{ minWidth: 0, flex: 1 }}>
@@ -358,7 +332,7 @@ export default function AdminDashboard() {
                 <Clock style={{ height: "1rem", width: "1rem", color: WARNING_AMBER, flexShrink: 0 }} />
               </div>
             ))}
-            {pendingVehicles.length === 0 && (
+            {list.length === 0 && (
               <p style={labelSmStyle}>No pending listings.</p>
             )}
           </div>

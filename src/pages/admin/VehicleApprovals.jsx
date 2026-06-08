@@ -80,12 +80,12 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, EyeOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatusBadge from "../../components/StatusBadge";
-import { VEHICLES } from "../../data/mockData";
+import { getVehicles, updateVehicleStatus } from "../../lib/api";
 import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
@@ -97,14 +97,54 @@ import {
 } from "../../app/assets/constants/zevgrid-colors";
 
 export default function VehicleApprovals() {
-  const [list, setList] = useState(VEHICLES);
+  const [list, setList] = useState([]);
   const [tab, setTab] = useState("pending");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadApprovals() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getVehicles({
+          status: tab === "all" ? undefined : tab,
+        });
+        if (!ignore) setList(result.data);
+      } catch (error) {
+        if (!ignore) {
+          setList([]);
+          setLoadError(error.message || "Vehicle approvals could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadApprovals();
+    return () => {
+      ignore = true;
+    };
+  }, [tab]);
 
   const filtered = tab === "all" ? list : list.filter((v) => v.status === tab);
 
-  const act = (id, status) => {
-    setList((prev) => prev.map((v) => (v.id === id ? { ...v, status } : v)));
-    toast.success(`Listing ${status}`);
+  const act = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      const result = await updateVehicleStatus(id, status);
+      setList((prev) => prev.map((v) => (v.id === id ? { ...v, ...result.data } : v)));
+      toast.success(result.message || `Listing ${status}`);
+    } catch (error) {
+      toast.error("Update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setUpdatingId("");
+    }
   };
 
   const tabItems = ["pending", "live", "draft", "all"];
@@ -174,7 +214,41 @@ export default function VehicleApprovals() {
           gap: "1rem",
         }}
       >
-        {filtered.map((v) => (
+        {isLoading && (
+          <div
+            style={{
+              gridColumn: "1 / -1",
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            Loading listings...
+          </div>
+        )}
+
+        {!isLoading && loadError && (
+          <div
+            style={{
+              gridColumn: "1 / -1",
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            {loadError}
+          </div>
+        )}
+
+        {!isLoading && !loadError && filtered.map((v) => (
           <div
             key={v.id}
             data-testid={`approval-${v.id}`}
@@ -240,6 +314,7 @@ export default function VehicleApprovals() {
               >
                 <Button
                   data-testid={`approve-${v.id}`}
+                  disabled={updatingId === v.id}
                   onClick={() => act(v.id, "live")}
                   size="sm"
                   style={{
@@ -262,6 +337,7 @@ export default function VehicleApprovals() {
                 </Button>
                 <Button
                   data-testid={`reject-${v.id}`}
+                  disabled={updatingId === v.id}
                   onClick={() => act(v.id, "inactive")}
                   size="sm"
                   variant="outline"
@@ -291,6 +367,7 @@ export default function VehicleApprovals() {
               <div style={{ display: "flex", gap: "0.5rem", borderTop: "1px solid #F1F5F9", padding: "0.75rem" }}>
                 <Button
                   data-testid={`hide-${v.id}`}
+                  disabled={updatingId === v.id}
                   onClick={() => act(v.id, "inactive")}
                   size="sm"
                   variant="outline"
@@ -318,7 +395,7 @@ export default function VehicleApprovals() {
         ))}
 
         {/* Empty state */}
-        {filtered.length === 0 && (
+        {!isLoading && !loadError && filtered.length === 0 && (
           <div
             style={{
               gridColumn: "1 / -1",

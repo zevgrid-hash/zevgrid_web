@@ -1,114 +1,7 @@
-// import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
-// import { LayoutGrid, UserCheck, CarFront, ListChecks, Users, Zap, LogOut } from "lucide-react";
-// import { Button } from "../components/ui/button";
 
-// const items = [
-//   { to: "/admin/dashboard", label: "Overview", icon: LayoutGrid, testid: "admin-nav-overview" },
-//   { to: "/admin/dealer-approvals", label: "Dealers", icon: UserCheck, testid: "admin-nav-dealers" },
-//   { to: "/admin/vehicle-approvals", label: "Vehicles", icon: CarFront, testid: "admin-nav-vehicles" },
-//   { to: "/admin/listings", label: "Listings", icon: ListChecks, testid: "admin-nav-listings" },
-//   { to: "/admin/leads", label: "Leads", icon: Users, testid: "admin-nav-leads" },
-// ];
-
-// export default function AdminLayout() {
-//   const navigate = useNavigate();
-//   return (
-//     <div className="flex min-h-screen bg-slate-50">
-//       {/* Sidebar (desktop) */}
-//       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-slate-900 text-white md:block">
-//         <div className="flex h-16 items-center gap-2 border-b border-slate-800 px-6">
-//           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-500 text-slate-900">
-//             <Zap className="h-4 w-4" strokeWidth={2.5} />
-//           </span>
-//           <div className="leading-tight">
-//             <p className="font-display text-base font-bold">ZevGrid</p>
-//             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">Admin</p>
-//           </div>
-//         </div>
-//         <nav className="mt-4 space-y-1 px-3">
-//           {items.map((i) => (
-//             <NavLink
-//               key={i.to}
-//               to={i.to}
-//               data-testid={i.testid}
-//               className={({ isActive }) =>
-//                 `flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors ${
-//                   isActive
-//                     ? "bg-emerald-500 text-slate-900"
-//                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
-//                 }`
-//               }
-//             >
-//               <i.icon className="h-4 w-4" />
-//               {i.label}
-//             </NavLink>
-//           ))}
-//         </nav>
-//         <div className="absolute bottom-4 w-64 px-6">
-//           <button
-//             onClick={() => navigate("/admin/login")}
-//             data-testid="admin-logout-btn"
-//             className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-white"
-//           >
-//             <LogOut className="h-3.5 w-3.5" /> Logout
-//           </button>
-//         </div>
-//       </aside>
-
-//       <div className="flex min-h-screen flex-1 flex-col pb-16 md:pb-0">
-//         {/* Mobile top bar */}
-//         <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-slate-200 bg-slate-900 px-4 text-white md:hidden">
-//           <Link to="/admin/dashboard" className="flex items-center gap-2" data-testid="admin-mobile-logo">
-//             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500 text-slate-900">
-//               <Zap className="h-3.5 w-3.5" strokeWidth={2.5} />
-//             </span>
-//             <p className="font-display text-sm font-bold">ZevGrid<span className="text-emerald-400">.</span> Admin</p>
-//           </Link>
-//           <Button
-//             variant="ghost"
-//             size="icon"
-//             onClick={() => navigate("/admin/login")}
-//             data-testid="admin-mobile-logout"
-//             className="text-white hover:bg-slate-800 hover:text-white"
-//           >
-//             <LogOut className="h-4 w-4" />
-//           </Button>
-//         </header>
-
-//         <main className="flex-1">
-//           <Outlet />
-//         </main>
-
-//         {/* Mobile bottom nav */}
-//         <nav
-//           data-testid="admin-bottom-nav"
-//           className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white md:hidden"
-//         >
-//           <div className="grid grid-cols-5">
-//             {items.map((i) => (
-//               <NavLink
-//                 key={i.to}
-//                 to={i.to}
-//                 data-testid={`${i.testid}-mobile`}
-//                 className={({ isActive }) =>
-//                   `flex flex-col items-center justify-center gap-1 py-2.5 text-[9px] font-bold uppercase tracking-wider ${
-//                     isActive ? "text-emerald-700" : "text-slate-500"
-//                   }`
-//                 }
-//               >
-//                 <i.icon className="h-5 w-5" />
-//                 {i.label}
-//               </NavLink>
-//             ))}
-//           </div>
-//         </nav>
-//       </div>
-//     </div>
-//   );
-// }
 import { useState } from "react";
 import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
-import { LayoutGrid, UserCheck, CarFront, ListChecks, Users, Zap, LogOut } from "lucide-react";
+import { Building2, LayoutGrid, UserCheck, CarFront, ListChecks, Users, Zap, LogOut } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
   ELECTRIC_CYAN,
@@ -268,6 +161,7 @@ const items = [
   { to: "/admin/vehicle-approvals",label: "Vehicles",  icon: CarFront,   testid: "admin-nav-vehicles"  },
   { to: "/admin/listings",         label: "Listings",  icon: ListChecks, testid: "admin-nav-listings"  },
   { to: "/admin/leads",            label: "Leads",     icon: Users,      testid: "admin-nav-leads"     },
+  { to: "/admin/businesses",       label: "Businesses",icon: Building2,  testid: "admin-nav-businesses"},
 ];
 
 // ─── Sidebar NavLink ──────────────────────────────────────────────────────────
@@ -374,7 +268,7 @@ export default function AdminLayout() {
 
         {/* Mobile bottom nav */}
         <nav data-testid="admin-bottom-nav" style={s.bottomNav} className="md:hidden">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)" }}>
             {items.map((i) => (
               <NavLink
                 key={i.to}

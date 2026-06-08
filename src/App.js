@@ -12,7 +12,7 @@ import VehicleDetail from "./pages/public/VehicleDetail";
 import RequirementForm from "./pages/public/RequirementForm";
 import BusinessSignup from "./pages/public/BusinessSignup";
 import BusinessLogin from "./pages/public/BusinessLogin";
-import DealerSignup from "./pages/public/BusinessSignup";
+import DealerSignup from "./pages/public/DealerSignup";
 
 import DealerDashboard from "./pages/dealer/DealerDashboard";
 import MyListings from "./pages/dealer/MyListings";
@@ -25,6 +25,7 @@ import DealerApprovals from "./pages/admin/DealerApprovals";
 import VehicleApprovals from "./pages/admin/VehicleApprovals";
 import ListingManagement from "./pages/admin/ListingManagement";
 import LeadManagement from "./pages/admin/LeadManagement";
+import BusinessManagement from "./pages/admin/BusinessManagement";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
             <Route path="/admin/vehicle-approvals" element={<VehicleApprovals />} />
             <Route path="/admin/listings" element={<ListingManagement />} />
             <Route path="/admin/leads" element={<LeadManagement />} />
+            <Route path="/admin/businesses" element={<BusinessManagement />} />
           </Route>
         </Routes>
       </BrowserRouter>

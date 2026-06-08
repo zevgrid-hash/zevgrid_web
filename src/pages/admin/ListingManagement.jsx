@@ -1,107 +1,11 @@
-// import { useState } from "react";
-// import { Search as SearchIcon, Download } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import StatusBadge from "../../components/StatusBadge";
-// import { VEHICLES, DEALERS } from "../../data/mockData";
-// import { toast } from "sonner";
-
-// export default function ListingManagement() {
-//   const [q, setQ] = useState("");
-//   const [list, setList] = useState(VEHICLES);
-//   const [stateFilter, setStateFilter] = useState("all");
-
-//   const dealerById = (id) => DEALERS.find((d) => d.id === id);
-
-//   const filtered = list.filter((v) => {
-//     const text = `${v.brand} ${v.model} ${v.type}`.toLowerCase();
-//     const matchesQ = text.includes(q.toLowerCase());
-//     const matchesState = stateFilter === "all" || v.status === stateFilter;
-//     return matchesQ && matchesState;
-//   });
-
-//   const setStatus = (id, status) => {
-//     setList((prev) => prev.map((v) => (v.id === id ? { ...v, status } : v)));
-//     toast.success(`Listing marked ${status}`);
-//   };
-
-//   return (
-//     <div data-testid="listing-management-page" className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-//       <div className="flex flex-wrap items-center justify-between gap-3">
-//         <div>
-//           <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">All listings</p>
-//           <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Listing management</h1>
-//         </div>
-//         <Button data-testid="export-btn" variant="outline" className="border-slate-300">
-//           <Download className="mr-2 h-4 w-4" /> Export CSV
-//         </Button>
-//       </div>
-
-//       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-//         <div className="relative flex-1">
-//           <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-//           <Input data-testid="listings-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by brand, model, type..." className="h-11 pl-9" />
-//         </div>
-//         <Select value={stateFilter} onValueChange={setStateFilter}>
-//           <SelectTrigger className="sm:w-[200px]" data-testid="listings-status-filter"><SelectValue /></SelectTrigger>
-//           <SelectContent>
-//             <SelectItem value="all">All statuses</SelectItem>
-//             <SelectItem value="live">Live</SelectItem>
-//             <SelectItem value="pending">Pending</SelectItem>
-//             <SelectItem value="draft">Draft</SelectItem>
-//             <SelectItem value="inactive">Inactive</SelectItem>
-//           </SelectContent>
-//         </Select>
-//       </div>
-
-//       <div className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white">
-//         <div className="hidden grid-cols-[1.6fr_1.2fr_1fr_1fr_1fr] gap-4 border-b border-slate-100 bg-slate-50 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 lg:grid">
-//           <div>Vehicle</div><div>Dealer</div><div>Rent</div><div>Status</div><div>Action</div>
-//         </div>
-//         {filtered.map((v) => {
-//           const dealer = dealerById(v.dealerId);
-//           return (
-//             <div key={v.id} data-testid={`lm-row-${v.id}`} className="flex flex-col gap-3 border-b border-slate-100 p-4 lg:grid lg:grid-cols-[1.6fr_1.2fr_1fr_1fr_1fr] lg:items-center lg:gap-4 lg:px-5">
-//               <div className="flex items-center gap-3">
-//                 <img src={v.image} alt="" className="h-12 w-12 rounded object-cover" />
-//                 <div>
-//                   <p className="text-sm font-bold">{v.brand} {v.model}</p>
-//                   <p className="text-xs text-slate-500">{v.type} · {v.condition}</p>
-//                 </div>
-//               </div>
-//               <div>
-//                 <p className="text-sm font-semibold">{dealer?.dealership || "—"}</p>
-//                 <p className="text-xs text-slate-500">{dealer?.city}</p>
-//               </div>
-//               <p className="text-sm font-bold text-emerald-700">₹{v.monthlyRent.toLocaleString("en-IN")}<span className="text-xs font-medium text-slate-500">/mo</span></p>
-//               <div><StatusBadge status={v.status} /></div>
-//               <Select value={v.status} onValueChange={(val) => setStatus(v.id, val)}>
-//                 <SelectTrigger className="h-9 w-[140px]" data-testid={`lm-status-${v.id}`}><SelectValue /></SelectTrigger>
-//                 <SelectContent>
-//                   <SelectItem value="live">Live</SelectItem>
-//                   <SelectItem value="pending">Pending</SelectItem>
-//                   <SelectItem value="draft">Draft</SelectItem>
-//                   <SelectItem value="inactive">Inactive</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           );
-//         })}
-//         {filtered.length === 0 && (
-//           <div className="p-10 text-center text-sm text-slate-500">No listings found.</div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search as SearchIcon, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatusBadge from "../../components/StatusBadge";
-import { VEHICLES, DEALERS } from "../../data/mockData";
+import { DEALERS } from "../../data/mockData";
+import { API_BASE_URL, getVehicles, updateVehicleStatus } from "../../lib/api";
 import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
@@ -113,8 +17,39 @@ import {
 
 export default function ListingManagement() {
   const [q, setQ] = useState("");
-  const [list, setList] = useState(VEHICLES);
+  const [list, setList] = useState([]);
   const [stateFilter, setStateFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadListings() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getVehicles({
+          q,
+          status: stateFilter,
+        });
+        if (!ignore) setList(result.data);
+      } catch (error) {
+        if (!ignore) {
+          setList([]);
+          setLoadError(error.message || "Listings could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadListings();
+    return () => {
+      ignore = true;
+    };
+  }, [q, stateFilter]);
 
   const dealerById = (id) => DEALERS.find((d) => d.id === id);
 
@@ -125,11 +60,39 @@ export default function ListingManagement() {
     return matchesQ && matchesState;
   });
 
-  const setStatus = (id, status) => {
-    setList((prev) => prev.map((v) => (v.id === id ? { ...v, status } : v)));
-    toast.success(`Listing marked ${status}`);
+  const setStatus = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      const result = await updateVehicleStatus(id, status);
+      setList((prev) => prev.map((v) => (v.id === id ? { ...v, ...result.data } : v)));
+      toast.success(result.message || `Listing marked ${status}`);
+    } catch (error) {
+      toast.error("Update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setUpdatingId("");
+    }
   };
-
+const handleExport = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/export/listings.csv`, {
+      method: "GET",
+      headers: { accept: "*/*" },
+    });
+    if (!response.ok) throw new Error("Export failed");
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "listings_list.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success("listings exported successfully");
+  } catch (error) {
+    toast.error("Export failed", { description: error.message || "Please try again." });
+  }
+};
   const inputStyle = {
     height: "2.75rem",
     border: `1px solid ${ELECTRIC_CYAN}33`,
@@ -174,6 +137,7 @@ export default function ListingManagement() {
             gap: "0.5rem",
             cursor: "pointer",
           }}
+          onClick={handleExport} 
           onMouseEnter={(e) => (e.currentTarget.style.borderColor = ELECTRIC_CYAN)}
           onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#E2E8F0")}
         >
@@ -261,7 +225,19 @@ export default function ListingManagement() {
         </div>
 
         {/* Rows */}
-        {filtered.map((v) => {
+        {isLoading && (
+          <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
+            Loading listings...
+          </div>
+        )}
+
+        {!isLoading && loadError && (
+          <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
+            {loadError}
+          </div>
+        )}
+
+        {!isLoading && !loadError && filtered.map((v) => {
           const dealer = dealerById(v.dealerId);
           return (
             <div
@@ -303,7 +279,7 @@ export default function ListingManagement() {
               <div><StatusBadge status={v.status} /></div>
 
               {/* Action select */}
-              <Select value={v.status} onValueChange={(val) => setStatus(v.id, val)}>
+              <Select value={v.status} onValueChange={(val) => setStatus(v.id, val)} disabled={updatingId === v.id}>
                 <SelectTrigger
                   data-testid={`lm-status-${v.id}`}
                   style={{
@@ -332,7 +308,7 @@ export default function ListingManagement() {
         })}
 
         {/* Empty state */}
-        {filtered.length === 0 && (
+        {!isLoading && !loadError && filtered.length === 0 && (
           <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
             No listings found.
           </div>

@@ -246,13 +246,10 @@ export const STATS = {
   },
 };
 
-// ─── Lead Stages ──────────────────────────────────────────────────────────────
-// color object now uses ZevGrid inline-style tokens instead of Tailwind classes,
-// matching the StatusBadge component's { color, bg, border } shape.
 
 export const LEAD_STAGES = [
   {
-    key: "new",
+    key: "new_lead",
     label: "New",
     color: {
       color: ELECTRIC_CYAN,

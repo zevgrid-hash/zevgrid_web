@@ -1,129 +1,11 @@
-// import { useState } from "react";
-// import { CheckCircle2, XCircle, FileText } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import StatusBadge from "../../components/StatusBadge";
-// import { DEALERS } from "../../data/mockData";
-// import { toast } from "sonner";
 
-// export default function DealerApprovals() {
-//   const [list, setList] = useState(DEALERS);
-//   const [tab, setTab] = useState("pending");
-
-//   const filtered = tab === "all" ? list : list.filter((d) => d.status === tab);
-
-//   const act = (id, status) => {
-//     setList((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)));
-//     toast.success(`Dealer ${status}`);
-//   };
-
-//   return (
-//     <div data-testid="dealer-approvals-page" className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-//       <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">Verification queue</p>
-//       <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Dealer approvals</h1>
-
-//       <Tabs value={tab} onValueChange={setTab} className="mt-5">
-//         <TabsList data-testid="dealer-approvals-tabs">
-//           <TabsTrigger value="pending">Pending</TabsTrigger>
-//           <TabsTrigger value="approved">Approved</TabsTrigger>
-//           <TabsTrigger value="rejected">Rejected</TabsTrigger>
-//           <TabsTrigger value="all">All</TabsTrigger>
-//         </TabsList>
-//       </Tabs>
-
-//       <div className="mt-5 space-y-3">
-//         {filtered.map((d) => (
-//           <div key={d.id} data-testid={`dealer-row-${d.id}`} className="rounded-xl border border-slate-200 bg-white p-5">
-//             <div className="flex flex-wrap items-start justify-between gap-3">
-//               <div>
-//                 <div className="flex items-center gap-2">
-//                   <h3 className="font-display text-lg font-bold">{d.dealership}</h3>
-//                   <StatusBadge status={d.status} />
-//                 </div>
-//                 <p className="mt-1 text-sm text-slate-600">{d.contact} · {d.mobile} · {d.email}</p>
-//                 <p className="mt-0.5 text-xs text-slate-500">{d.address}</p>
-//               </div>
-//               <div className="text-right">
-//                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Joined</p>
-//                 <p className="text-sm font-semibold">{d.joinedOn}</p>
-//               </div>
-//             </div>
-
-//             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-//               <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-//                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">GST</p>
-//                 <p className="mt-1 font-mono text-xs font-semibold">{d.gst}</p>
-//               </div>
-//               <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-//                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">PAN</p>
-//                 <p className="mt-1 font-mono text-xs font-semibold">{d.pan}</p>
-//               </div>
-//               <div className="rounded-md border border-slate-100 bg-slate-50 p-3">
-//                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">City</p>
-//                 <p className="mt-1 text-sm font-semibold">{d.city}</p>
-//               </div>
-//             </div>
-
-//             <div className="mt-4">
-//               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Documents uploaded ({d.docs.length})</p>
-//               <div className="mt-2 flex flex-wrap gap-2">
-//                 {d.docs.map((doc) => (
-//                   <span key={doc} className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold">
-//                     <FileText className="h-3 w-3 text-slate-500" /> {doc}
-//                   </span>
-//                 ))}
-//               </div>
-//             </div>
-
-//             {d.status === "pending" && (
-//               <div className="mt-5 flex flex-wrap gap-2">
-//                 <Button
-//                   data-testid={`dealer-approve-${d.id}`}
-//                   onClick={() => act(d.id, "approved")}
-//                   className="bg-emerald-700 text-white hover:bg-emerald-800"
-//                 >
-//                   <CheckCircle2 className="mr-2 h-4 w-4" /> Approve
-//                 </Button>
-//                 <Button
-//                   data-testid={`dealer-reject-${d.id}`}
-//                   onClick={() => act(d.id, "rejected")}
-//                   variant="outline"
-//                   className="border-rose-300 text-rose-700 hover:bg-rose-50"
-//                 >
-//                   <XCircle className="mr-2 h-4 w-4" /> Reject
-//                 </Button>
-//               </div>
-//             )}
-
-//             {d.status === "approved" && (
-//               <div className="mt-5">
-//                 <Button
-//                   data-testid={`dealer-suspend-${d.id}`}
-//                   onClick={() => act(d.id, "suspended")}
-//                   variant="outline"
-//                   className="border-slate-300"
-//                 >
-//                   Suspend
-//                 </Button>
-//               </div>
-//             )}
-//           </div>
-//         ))}
-//         {filtered.length === 0 && (
-//           <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-//             No dealers in this tab.
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-import { useState } from "react";
-import { CheckCircle2, XCircle, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, XCircle, FileText, Search as SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatusBadge from "../../components/StatusBadge";
-import { DEALERS } from "../../data/mockData";
+import { getDealers, updateDealerStatus } from "../../lib/api";
 import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
@@ -136,17 +18,68 @@ import {
 } from "../../app/assets/constants/zevgrid-colors";
 
 export default function DealerApprovals() {
-  const [list, setList] = useState(DEALERS);
+  const [list, setList] = useState([]);
   const [tab, setTab] = useState("pending");
+  const [q, setQ] = useState("");
+  const [city, setCity] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadDealers() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getDealers({
+          status: tab === "all" ? undefined : tab,
+          city,
+          q,
+        });
+        if (!ignore) setList(result.data);
+      } catch (error) {
+        if (!ignore) {
+          setList([]);
+          setLoadError(error.message || "Dealers could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadDealers();
+    return () => {
+      ignore = true;
+    };
+  }, [tab, city, q]);
 
   const filtered = tab === "all" ? list : list.filter((d) => d.status === tab);
 
-  const act = (id, status) => {
-    setList((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)));
-    toast.success(`Dealer ${status}`);
+  const act = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      const result = await updateDealerStatus(id, status);
+      setList((prev) => prev.map((d) => (d.id === id ? { ...d, ...result.data } : d)));
+      toast.success(result.message || `Dealer ${status}`);
+    } catch (error) {
+      toast.error("Update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setUpdatingId("");
+    }
   };
 
   const tabItems = ["pending", "approved", "rejected", "all"];
+  const inputStyle = {
+    height: "2.75rem",
+    border: `1px solid ${ELECTRIC_CYAN}33`,
+    backgroundColor: CLEAN_WHITE,
+    color: ENTERPRISE_CHARCOAL,
+    borderRadius: "0.5rem",
+  };
 
   return (
     <div
@@ -226,9 +159,75 @@ export default function DealerApprovals() {
         </Tabs>
       </div>
 
+      <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }} className="sm:flex-row">
+        <div style={{ position: "relative", flex: 1 }}>
+          <SearchIcon
+            style={{
+              position: "absolute",
+              left: "0.75rem",
+              top: "50%",
+              transform: "translateY(-50%)",
+              height: "1rem",
+              width: "1rem",
+              color: "#94A3B8",
+            }}
+          />
+          <Input
+            data-testid="dealer-search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search dealership, contact, email..."
+            style={{ ...inputStyle, paddingLeft: "2.25rem" }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = ELECTRIC_CYAN)}
+            onBlur={(e) => (e.currentTarget.style.borderColor = `${ELECTRIC_CYAN}33`)}
+          />
+        </div>
+        <Input
+          data-testid="dealer-city-filter"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="City"
+          style={{ ...inputStyle, width: "12.5rem" }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = ELECTRIC_CYAN)}
+          onBlur={(e) => (e.currentTarget.style.borderColor = `${ELECTRIC_CYAN}33`)}
+        />
+      </div>
+
       {/* Dealer list */}
       <div style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        {filtered.map((d) => (
+        {isLoading && (
+          <div
+            style={{
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            Loading dealers...
+          </div>
+        )}
+
+        {!isLoading && loadError && (
+          <div
+            style={{
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            {loadError}
+          </div>
+        )}
+
+        {!isLoading && !loadError && filtered.map((d) => (
           <div
             key={d.id}
             data-testid={`dealer-row-${d.id}`}
@@ -358,6 +357,7 @@ export default function DealerApprovals() {
               <div style={{ marginTop: "1.25rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                 <Button
                   data-testid={`dealer-approve-${d.id}`}
+                  disabled={updatingId === d.id}
                   onClick={() => act(d.id, "approved")}
                   style={{
                     backgroundColor: ACTIVE_EMERALD,
@@ -379,6 +379,7 @@ export default function DealerApprovals() {
                 </Button>
                 <Button
                   data-testid={`dealer-reject-${d.id}`}
+                  disabled={updatingId === d.id}
                   onClick={() => act(d.id, "rejected")}
                   variant="outline"
                   style={{
@@ -407,6 +408,7 @@ export default function DealerApprovals() {
               <div style={{ marginTop: "1.25rem" }}>
                 <Button
                   data-testid={`dealer-suspend-${d.id}`}
+                  disabled={updatingId === d.id}
                   onClick={() => act(d.id, "suspended")}
                   variant="outline"
                   style={{
@@ -430,7 +432,7 @@ export default function DealerApprovals() {
         ))}
 
         {/* Empty state */}
-        {filtered.length === 0 && (
+        {!isLoading && !loadError && filtered.length === 0 && (
           <div
             style={{
               borderRadius: "0.75rem",

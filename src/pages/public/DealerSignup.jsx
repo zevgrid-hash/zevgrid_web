@@ -1,154 +1,4 @@
-// import { Link, useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// import { Upload, CheckCircle2, Shield } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { toast } from "sonner";
 
-// const DOCS = [
-//   { key: "gst", label: "GST Certificate" },
-//   { key: "pan", label: "PAN / Business Registration" },
-//   { key: "cheque", label: "Cancelled Cheque" },
-//   { key: "id", label: "ID Proof (Aadhaar / Director KYC)" },
-//   { key: "dealer", label: "Dealership Proof (Shop Act)" },
-// ];
-
-// export default function DealerSignup() {
-//   const navigate = useNavigate();
-//   const [step, setStep] = useState(1);
-//   const [docs, setDocs] = useState({});
-//   const [form, setForm] = useState({
-//     dealership: "", contact: "", mobile: "", email: "",
-//     city: "Pune", gst: "", pan: "", address: "", bank: "",
-//   });
-//   const update = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-
-//   const next = () => {
-//     if (step === 1) {
-//       if (!form.dealership || !form.mobile || !form.email) return toast.error("Please fill required fields.");
-//     }
-//     setStep(step + 1);
-//     window.scrollTo({ top: 0, behavior: "smooth" });
-//   };
-
-//   const submit = () => {
-//     toast.success("Application submitted", { description: "Admin will verify within 24–48 hours." });
-//     navigate("/dealer/dashboard");
-//   };
-
-//   return (
-//     <div data-testid="dealer-signup-page" className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-//       <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">Become a dealer</p>
-//       <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Join ZevGrid as a dealer</h1>
-//       <p className="mt-2 text-sm text-slate-600">
-//         List your commercial EV inventory. Approval in 24–48 hours after KYC verification.
-//       </p>
-
-//       {/* Stepper */}
-//       <div data-testid="dealer-stepper" className="mt-8 flex items-center gap-2">
-//         {[1, 2, 3].map((n) => (
-//           <div key={n} className="flex flex-1 items-center gap-2">
-//             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
-//               step >= n ? "bg-emerald-700 text-white" : "bg-slate-200 text-slate-500"
-//             }`}>
-//               {step > n ? <CheckCircle2 className="h-4 w-4" /> : n}
-//             </div>
-//             {n < 3 && <div className={`h-0.5 flex-1 ${step > n ? "bg-emerald-700" : "bg-slate-200"}`} />}
-//           </div>
-//         ))}
-//       </div>
-//       <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-//         <span className={step >= 1 ? "text-emerald-700" : ""}>Business info</span>
-//         <span className={step >= 2 ? "text-emerald-700" : ""}>Documents</span>
-//         <span className={step >= 3 ? "text-emerald-700" : ""}>Review</span>
-//       </div>
-
-//       <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
-//         {step === 1 && (
-//           <div className="space-y-5" data-testid="dealer-step-1">
-//             <h2 className="font-display text-xl font-bold">Dealership details</h2>
-//             <div>
-//               <Label>Dealership name *</Label>
-//               <Input data-testid="dealer-dealership" value={form.dealership} onChange={(e) => update("dealership", e.target.value)} className="mt-1.5 h-11" />
-//             </div>
-//             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-//               <div><Label>Contact person</Label><Input data-testid="dealer-contact" value={form.contact} onChange={(e) => update("contact", e.target.value)} className="mt-1.5 h-11" /></div>
-//               <div><Label>Mobile *</Label><Input data-testid="dealer-mobile" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} className="mt-1.5 h-11" /></div>
-//               <div><Label>Email *</Label><Input data-testid="dealer-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="mt-1.5 h-11" /></div>
-//               <div><Label>City</Label><Input data-testid="dealer-city" value={form.city} onChange={(e) => update("city", e.target.value)} className="mt-1.5 h-11" /></div>
-//               <div><Label>GST number</Label><Input data-testid="dealer-gst" value={form.gst} onChange={(e) => update("gst", e.target.value)} placeholder="27AABCU9603R1Z2" className="mt-1.5 h-11" /></div>
-//               <div><Label>PAN</Label><Input data-testid="dealer-pan" value={form.pan} onChange={(e) => update("pan", e.target.value)} className="mt-1.5 h-11" /></div>
-//             </div>
-//             <div><Label>Dealership address</Label><Input data-testid="dealer-address" value={form.address} onChange={(e) => update("address", e.target.value)} className="mt-1.5 h-11" /></div>
-//             <div><Label>Bank account (payout)</Label><Input data-testid="dealer-bank" value={form.bank} onChange={(e) => update("bank", e.target.value)} placeholder="HDFC · XXXX1234 · IFSC" className="mt-1.5 h-11" /></div>
-//             <Button onClick={next} data-testid="dealer-step1-next" className="bg-emerald-700 text-white hover:bg-emerald-800">Continue to documents</Button>
-//           </div>
-//         )}
-
-//         {step === 2 && (
-//           <div className="space-y-5" data-testid="dealer-step-2">
-//             <h2 className="font-display text-xl font-bold">Upload documents</h2>
-//             <p className="text-sm text-slate-600">PDF or image. Max 5MB each. Required for KYC.</p>
-//             <div className="space-y-3">
-//               {DOCS.map((d) => (
-//                 <div key={d.key} className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 p-3">
-//                   <div>
-//                     <p className="text-sm font-semibold">{d.label}</p>
-//                     <p className="text-xs text-slate-500">{docs[d.key] ? docs[d.key] : "Not uploaded"}</p>
-//                   </div>
-//                   <Button
-//                     variant={docs[d.key] ? "outline" : "default"}
-//                     data-testid={`upload-${d.key}`}
-//                     className={docs[d.key] ? "border-emerald-300 text-emerald-700" : "bg-slate-900 text-white hover:bg-slate-800"}
-//                     onClick={() => setDocs((p) => ({ ...p, [d.key]: `${d.label.split(" ")[0]}.pdf` }))}
-//                   >
-//                     {docs[d.key] ? <CheckCircle2 className="mr-1 h-4 w-4" /> : <Upload className="mr-1 h-4 w-4" />}
-//                     {docs[d.key] ? "Uploaded" : "Upload"}
-//                   </Button>
-//                 </div>
-//               ))}
-//             </div>
-//             <div className="flex gap-3">
-//               <Button variant="outline" onClick={() => setStep(1)} data-testid="dealer-step2-back">Back</Button>
-//               <Button onClick={next} data-testid="dealer-step2-next" className="bg-emerald-700 text-white hover:bg-emerald-800">Review & submit</Button>
-//             </div>
-//           </div>
-//         )}
-
-//         {step === 3 && (
-//           <div className="space-y-5" data-testid="dealer-step-3">
-//             <h2 className="font-display text-xl font-bold">Review and submit</h2>
-//             <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm">
-//               <p className="font-bold">{form.dealership || "—"}</p>
-//               <p className="text-slate-600">{form.contact} · {form.mobile} · {form.email}</p>
-//               <p className="mt-1 text-slate-600">{form.address || "Address not provided"}</p>
-//               <p className="mt-1 text-slate-600">GST: {form.gst || "—"} · PAN: {form.pan || "—"}</p>
-//             </div>
-//             <div className="rounded-md border border-slate-200 p-4 text-sm">
-//               <p className="font-bold">Documents uploaded</p>
-//               <ul className="mt-2 space-y-1">
-//                 {DOCS.map((d) => (
-//                   <li key={d.key} className="flex items-center gap-2">
-//                     <CheckCircle2 className={`h-4 w-4 ${docs[d.key] ? "text-emerald-700" : "text-slate-300"}`} />
-//                     <span className={docs[d.key] ? "" : "text-slate-400"}>{d.label}</span>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//             <div className="flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
-//               <Shield className="mt-0.5 h-4 w-4" /> By submitting, you agree to ZevGrid dealer terms. Admin will verify and activate your account within 24–48 hours.
-//             </div>
-//             <div className="flex gap-3">
-//               <Button variant="outline" onClick={() => setStep(2)} data-testid="dealer-step3-back">Back</Button>
-//               <Button onClick={submit} data-testid="dealer-step3-submit" className="bg-emerald-700 text-white hover:bg-emerald-800">Submit application</Button>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Upload, CheckCircle2, Shield } from "lucide-react";
@@ -156,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { createDealer } from "../../lib/api";
 import {
   ELECTRIC_CYAN,
   ENTERPRISE_CHARCOAL,
@@ -163,9 +14,8 @@ import {
   ACTIVE_EMERALD,
   CLEAN_WHITE,
   LIGHT_CANVAS_GREY,
-} from "@/components/ui/zevgrid-colors";
+} from  "../../app/assets/constants/zevgrid-colors";
 
-// ─── Style tokens ─────────────────────────────────────────────────────────────
 
 const s = {
   eyebrow: {
@@ -300,6 +150,7 @@ export default function DealerSignup() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [docs, setDocs] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     dealership: "", contact: "", mobile: "", email: "",
     city: "Pune", gst: "", pan: "", address: "", bank: "",
@@ -313,9 +164,36 @@ export default function DealerSignup() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const submit = () => {
-    toast.success("Application submitted", { description: "Admin will verify within 24–48 hours." });
-    navigate("/dealer/dashboard");
+  const submit = async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await createDealer({
+        dealership: form.dealership,
+        contact: form.contact,
+        mobile: form.mobile,
+        email: form.email,
+        city: form.city,
+        gst: form.gst,
+        pan: form.pan,
+        address: form.address,
+        status: "pending",
+      });
+
+      if (result.data?.id) {
+        localStorage.setItem("zevgrid_dealer_id", result.data.id);
+      }
+
+      toast.success(result.message || "Dealer registered successfully", {
+        description: "Admin will verify within 24-48 hours.",
+      });
+      navigate("/dealer/dashboard");
+    } catch (error) {
+      toast.error("Dealer registration failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const stepLabels = ["Business info", "Documents", "Review"];
@@ -454,8 +332,10 @@ export default function DealerSignup() {
             </div>
 
             <div style={{ display: "flex", gap: "12px" }}>
-              <Button variant="outline" onClick={() => setStep(2)} data-testid="dealer-step3-back">Back</Button>
-              <Button variant="default" onClick={submit} data-testid="dealer-step3-submit">Submit application</Button>
+              <Button variant="outline" onClick={() => setStep(2)} data-testid="dealer-step3-back" disabled={isSubmitting}>Back</Button>
+              <Button variant="default" onClick={submit} data-testid="dealer-step3-submit" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Submit application"}
+              </Button>
             </div>
           </div>
         )}

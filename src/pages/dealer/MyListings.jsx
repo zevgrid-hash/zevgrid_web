@@ -105,14 +105,14 @@
 //   );
 // }
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusCircle, Search as SearchIcon, MoreVertical } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
 import StatusBadge from "../../components/StatusBadge";
-import { VEHICLES } from "../../data/mockData";
+import { deleteVehicle, getVehicles, updateVehicleAvailability } from "../../lib/api";
 import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
@@ -125,7 +125,40 @@ import {
 export default function MyListings() {
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("all");
-  const [items, setItems] = useState(VEHICLES.filter((v) => v.dealerId === "d-101"));
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [deletingId, setDeletingId] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadListings() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getVehicles({
+          dealerId: localStorage.getItem("zevgrid_dealer_id") || "d-101",
+          q,
+          status: ["live", "pending"].includes(tab) ? tab : undefined,
+        });
+        if (!ignore) setItems(result.data);
+      } catch (error) {
+        if (!ignore) {
+          setItems([]);
+          setLoadError(error.message || "Listings could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadListings();
+    return () => {
+      ignore = true;
+    };
+  }, [q, tab]);
 
   const filtered = items.filter((v) => {
     const matchesQ = `${v.brand} ${v.model}`.toLowerCase().includes(q.toLowerCase());
@@ -133,9 +166,39 @@ export default function MyListings() {
     return matchesQ && matchesTab;
   });
 
-  const changeAvailability = (id, value) => {
-    setItems((prev) => prev.map((v) => (v.id === id ? { ...v, availability: value } : v)));
-    toast.success(`Marked as ${value}`);
+  const changeAvailability = async (id, value) => {
+    setUpdatingId(id);
+    try {
+      const result = await updateVehicleAvailability(id, value);
+      setItems((prev) => prev.map((v) => (v.id === id ? { ...v, ...result.data } : v)));
+      toast.success(result.message || `Marked as ${value}`);
+    } catch (error) {
+      toast.error("Update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setUpdatingId("");
+    }
+  };
+
+  const deleteListing = async (id) => {
+    setDeletingId(id);
+    try {
+      const payload = await deleteVehicle(id);
+
+      if (payload?.success === false) {
+        throw new Error(payload?.message || payload?.error || "Listing could not be deleted.");
+      }
+
+      setItems((prev) => prev.filter((v) => v.id !== id));
+      toast.success(payload?.message || "Listing deleted");
+    } catch (error) {
+      toast.error("Delete failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setDeletingId("");
+    }
   };
 
   const tabItems = ["all", "live", "pending", "reserved"];
@@ -294,7 +357,19 @@ export default function MyListings() {
         </div>
 
         {/* Rows */}
-        {filtered.map((v) => (
+        {isLoading && (
+          <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
+            Loading listings...
+          </div>
+        )}
+
+        {!isLoading && loadError && (
+          <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
+            {loadError}
+          </div>
+        )}
+
+        {!isLoading && !loadError && filtered.map((v) => (
           <div
             key={v.id}
             data-testid={`listing-row-${v.id}`}
@@ -365,10 +440,13 @@ export default function MyListings() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => changeAvailability(v.id, "available")}>Mark available</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => changeAvailability(v.id, "reserved")}>Mark reserved</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => changeAvailability(v.id, "rented")}>Mark rented</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => changeAvailability(v.id, "unavailable")}>Mark unavailable</DropdownMenuItem>
+                  <DropdownMenuItem disabled={updatingId === v.id} onClick={() => changeAvailability(v.id, "available")}>Mark available</DropdownMenuItem>
+                  <DropdownMenuItem disabled={updatingId === v.id} onClick={() => changeAvailability(v.id, "reserved")}>Mark reserved</DropdownMenuItem>
+                  <DropdownMenuItem disabled={updatingId === v.id} onClick={() => changeAvailability(v.id, "rented")}>Mark rented</DropdownMenuItem>
+                  <DropdownMenuItem disabled={updatingId === v.id} onClick={() => changeAvailability(v.id, "unavailable")}>Mark unavailable</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => deleteListing(v.id)}>
+                    {deletingId === v.id ? "Deleting..." : "Delete listing"}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -376,7 +454,7 @@ export default function MyListings() {
         ))}
 
         {/* Empty state */}
-        {filtered.length === 0 && (
+        {!isLoading && !loadError && filtered.length === 0 && (
           <div style={{ padding: "2.5rem", textAlign: "center", fontSize: "0.875rem", color: "#94A3B8" }}>
             No listings match your filters.
           </div>

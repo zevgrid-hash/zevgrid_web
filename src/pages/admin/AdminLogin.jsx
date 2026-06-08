@@ -1,70 +1,4 @@
-// import { useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// import { Shield, Zap } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { toast } from "sonner";
-// import logo from "../../app/assets/logo.png"
 
-
-// export default function AdminLogin() {
-//   const navigate = useNavigate();
-//   const [email, setEmail] = useState("admin@zevgrid.in");
-//   const [password, setPassword] = useState("admin123");
-
-//   const submit = (e) => {
-//     e.preventDefault();
-//     if (!email || !password) return toast.error("Enter credentials.");
-//     toast.success("Admin access granted");
-//     navigate("/admin/dashboard");
-//   };
-
-//   return (
-//     <div data-testid="admin-login-page" className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
-//       <div className="w-full max-w-md">
-//         <div className="flex items-center gap-2 text-white">
-//           <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-500 text-slate-900">
-//             {/* <Zap className="h-5 w-5" strokeWidth={2.5} /> */}
-//              <img
-//             src={logo}
-//             alt="ZevGrid"
-//             className="h-8 w-auto"
-//           />
-//           </span>
-//           <div>
-//             <p className="font-display text-lg font-bold">ZevGrid<span className="text-emerald-400">.</span></p>
-//             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-400">Admin Console</p>
-//           </div>
-//         </div>
-
-//         <div className="mt-8 rounded-xl border border-slate-800 bg-slate-950 p-6">
-//           <div className="flex items-center gap-2 text-emerald-400">
-//             <Shield className="h-4 w-4" />
-//             <p className="text-xs font-bold uppercase tracking-[0.25em]">Restricted access</p>
-//           </div>
-//           <h1 className="mt-3 font-display text-2xl font-bold text-white">Ops & moderation</h1>
-//           <p className="mt-1 text-sm text-slate-400">Authorized ZevGrid operators only.</p>
-
-//           <form onSubmit={submit} className="mt-6 space-y-4">
-//             <div>
-//               <Label className="text-slate-300">Email</Label>
-//               <Input data-testid="admin-email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 h-11 border-slate-700 bg-slate-900 text-white placeholder:text-slate-500" />
-//             </div>
-//             <div>
-//               <Label className="text-slate-300">Password</Label>
-//               <Input data-testid="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 h-11 border-slate-700 bg-slate-900 text-white placeholder:text-slate-500" />
-//             </div>
-//             <Button type="submit" data-testid="admin-login-submit" className="h-12 w-full rounded-md bg-emerald-500 text-sm font-bold text-slate-900 hover:bg-emerald-400">
-//               Enter console
-//             </Button>
-//           </form>
-//           <p className="mt-4 text-center text-xs text-slate-500">Demo: any credentials work</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Shield } from "lucide-react";
@@ -73,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import logo from "../../app/assets/logo.png";
+import { adminLogin } from "../../lib/api";
 import {
   ELECTRIC_CYAN,
   ENTERPRISE_CHARCOAL,
@@ -83,14 +18,56 @@ import {
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@zevgrid.in");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("dhundhoo@gmail.com");
+  const [password, setPassword] = useState("dhundhoo");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!email || !password) return toast.error("Enter credentials.");
-    toast.success("Admin access granted");
-    navigate("/admin/dashboard");
+    if (!email.trim() || !password) return toast.error("Enter credentials.");
+
+    setIsSubmitting(true);
+    try {
+      const payload = await adminLogin({
+        email: email.trim(),
+        password,
+      });
+      if (payload?.success === false) {
+        throw new Error(payload?.message || "Invalid admin credentials.");
+      }
+
+      const authData = payload?.data ?? {};
+      const token = authData.token;
+      const user = authData.user
+        ? {
+            id: authData.user.id,
+            email: authData.user.email,
+            name: authData.user.name,
+          }
+        : null;
+
+      if (!token) throw new Error("Login response did not include a token.");
+
+      const safeAuthData = {
+        token,
+        role: authData.role,
+        user,
+      };
+
+      localStorage.setItem("zevgrid_admin_auth", JSON.stringify(safeAuthData));
+      localStorage.setItem("zevgrid_admin_token", token);
+      localStorage.setItem("zevgrid_admin_role", authData.role || "");
+      if (user) localStorage.setItem("zevgrid_admin_user", JSON.stringify(user));
+
+      toast.success(payload?.message || "Admin access granted");
+      navigate("/admin/dashboard");
+    } catch (error) {
+      toast.error("Admin login failed", {
+        description: error.message || "Please check your credentials.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -180,6 +157,7 @@ export default function AdminLogin() {
                 data-testid="admin-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
                 style={{
                   marginTop: "0.375rem",
                   height: "2.75rem",
@@ -200,6 +178,7 @@ export default function AdminLogin() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
                 style={{
                   marginTop: "0.375rem",
                   height: "2.75rem",
@@ -215,6 +194,7 @@ export default function AdminLogin() {
 
             <Button
               type="submit"
+              disabled={isSubmitting}
               data-testid="admin-login-submit"
               style={{
                 height: "3rem",
@@ -225,18 +205,23 @@ export default function AdminLogin() {
                 fontSize: "0.875rem",
                 fontWeight: 700,
                 border: "none",
-                cursor: "pointer",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                opacity: isSubmitting ? 0.7 : 1,
                 transition: "opacity 0.15s ease",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.88")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) e.currentTarget.style.opacity = "0.88";
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) e.currentTarget.style.opacity = "1";
+              }}
             >
-              Enter console
+              {isSubmitting ? "Signing in..." : "Enter console"}
             </Button>
           </form>
 
           <p style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.75rem", color: "#64748B" }}>
-            Demo: any credentials work
+            Authorized credentials required
           </p>
         </div>
       </div>

@@ -96,12 +96,13 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Phone, Mail, MessageSquare } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import StatusBadge from "../../components/StatusBadge";
-import { LEADS, LEAD_STAGES } from "../../data/mockData";
+import { LEAD_STAGES } from "../../data/mockData";
+import { getLeads, getLeadStages, updateLeadStage } from "../../lib/api";
 import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
@@ -112,14 +113,74 @@ import {
 } from "../../app/assets/constants/zevgrid-colors";
 
 export default function Inquiries() {
-  const [leads, setLeads] = useState(LEADS);
+  const [leads, setLeads] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
+  const [stageOptions, setStageOptions] = useState(LEAD_STAGES);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadStages() {
+      try {
+        const result = await getLeadStages();
+        if (!ignore && result.data.length > 0) setStageOptions(result.data);
+      } catch {
+        if (!ignore) setStageOptions(LEAD_STAGES);
+      }
+    }
+
+    loadStages();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadInquiries() {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const result = await getLeads({
+          dealerId: localStorage.getItem("zevgrid_dealer_id") || "d-101",
+          stage: filter === "all" ? undefined : filter,
+        });
+        if (!ignore) setLeads(result.data);
+      } catch (error) {
+        if (!ignore) {
+          setLeads([]);
+          setLoadError(error.message || "Inquiries could not be loaded.");
+        }
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadInquiries();
+    return () => {
+      ignore = true;
+    };
+  }, [filter]);
 
   const visible = filter === "all" ? leads : leads.filter((l) => l.stage === filter);
 
-  const updateStage = (id, stage) => {
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, stage } : l)));
-    toast.success(`Stage updated to ${stage}`);
+  const updateStage = async (id, stage) => {
+    setUpdatingId(id);
+    try {
+      const result = await updateLeadStage(id, stage);
+      setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, ...result.data } : l)));
+      toast.success(result.message || `Stage updated to ${stage}`);
+    } catch (error) {
+      toast.error("Lead update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setUpdatingId("");
+    }
   };
 
   const selectTriggerStyle = {
@@ -179,7 +240,7 @@ export default function Inquiries() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All stages</SelectItem>
-            {LEAD_STAGES.map((s) => (
+            {stageOptions.map((s) => (
               <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
             ))}
           </SelectContent>
@@ -188,7 +249,39 @@ export default function Inquiries() {
 
       {/* Lead cards */}
       <div style={{ marginTop: "1.25rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        {visible.map((l) => (
+        {isLoading && (
+          <div
+            style={{
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            Loading inquiries...
+          </div>
+        )}
+
+        {!isLoading && loadError && (
+          <div
+            style={{
+              borderRadius: "0.75rem",
+              border: `1px dashed ${ELECTRIC_CYAN}44`,
+              backgroundColor: CLEAN_WHITE,
+              padding: "2.5rem",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#94A3B8",
+            }}
+          >
+            {loadError}
+          </div>
+        )}
+
+        {!isLoading && !loadError && visible.map((l) => (
           <div
             key={l.id}
             data-testid={`inquiry-${l.id}`}
@@ -210,7 +303,7 @@ export default function Inquiries() {
                   {l.contact} · {l.type} · Created {l.createdOn}
                 </p>
               </div>
-              <Select value={l.stage} onValueChange={(v) => updateStage(l.id, v)}>
+              <Select value={l.stage} onValueChange={(v) => updateStage(l.id, v)} disabled={updatingId === l.id}>
                 <SelectTrigger
                   style={{ ...selectTriggerStyle, width: "10rem", height: "2.25rem" }}
                   data-testid={`inquiry-stage-${l.id}`}
@@ -218,7 +311,7 @@ export default function Inquiries() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {LEAD_STAGES.map((s) => (
+                  {stageOptions.map((s) => (
                     <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
                   ))}
                 </SelectContent>
@@ -237,7 +330,7 @@ export default function Inquiries() {
               {[
                 { label: "Vehicles",     value: `${l.vehiclesNeeded} × ${l.preferredType}` },
                 { label: "Budget",       value: l.budget },
-                { label: "Interested in", value: l.interestedIn },
+                { label: "Use case",      value: l.useCase },
               ].map(({ label, value }) => (
                 <div
                   key={label}
@@ -305,7 +398,7 @@ export default function Inquiries() {
         ))}
 
         {/* Empty state */}
-        {visible.length === 0 && (
+        {!isLoading && !loadError && visible.length === 0 && (
           <div
             style={{
               borderRadius: "0.75rem",

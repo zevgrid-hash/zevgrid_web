@@ -13,9 +13,10 @@ import {
   LIGHT_CANVAS_GREY,
   ACTIVE_EMERALD,
 } from "../../app/assets/constants/zevgrid-colors";
+import { getVehicles } from "../../lib/api";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const featured = VEHICLES.filter((v) => v.status === "live").slice(0, 4);
 
   // Map constants to CSS variables for clean Tailwind integration
   const themeStyles = {
@@ -29,7 +30,19 @@ export default function Home() {
     "--grey": LIGHT_CANVAS_GREY,
     "--emerald": ACTIVE_EMERALD,
   };
+  const [vehicles, setVehicles] = useState([]);
 
+  useEffect(() => {
+    async function loadVehicles() {
+      const result = await getVehicles({});
+      setVehicles(result.data);        // ✅ set state first
+      console.log(result.data);
+    }
+    loadVehicles();
+  }, []);
+
+  // ✅ derive featured from state, not from the API result inside useEffect
+  const featured = vehicles.filter((v) => v.status === "live").slice(0, 4);
   return (
     <div data-testid="home-page" style={themeStyles} className="bg-[var(--grey)] text-[var(--charcoal)]">
       {/* Hero */}
@@ -43,13 +56,13 @@ export default function Home() {
           style={{ background: `linear-gradient(to right, ${INFRASTRUCTURE_NAVY}, ${INFRASTRUCTURE_NAVY}D9, ${INFRASTRUCTURE_NAVY}66)` }}
         />
         <div className="relative mx-auto w-full max-w-7xl px-4 pb-20 pt-16 sm:px-6 md:pb-32 md:pt-28 lg:px-8">
-          <span 
+          {/* <span 
             className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.25em]"
             style={{ borderColor: `${ACTIVE_EMERALD}66`, backgroundColor: `${ACTIVE_EMERALD}1A`, color: ACTIVE_EMERALD }}
           >
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--emerald)]" />
             Pune pilot · live
-          </span>
+          </span> */}
           <h1 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
             Lease verified commercial EVs{" "}
             <span className="text-[var(--cyan)]">without the fleet headache.</span>
@@ -65,7 +78,7 @@ export default function Home() {
                 className="h-12 w-full rounded-md px-6 text-sm font-bold transition-opacity hover:opacity-90 sm:w-auto bg-[var(--cyan)] text-[var(--navy)]"
               >
                 <SearchIcon className="mr-2 h-4 w-4" />
-                Browse EVs in Pune
+                Browse EVs
               </Button>
             </Link>
             <Link to="/requirement">
@@ -138,7 +151,7 @@ export default function Home() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--cyan)]">Verified inventory</p>
             <h2 className="mt-2 font-display text-2xl font-bold sm:text-3xl lg:text-4xl text-[var(--charcoal)]">
-              Fresh this week in Pune
+              Fresh this week 
             </h2>
           </div>
           <Link

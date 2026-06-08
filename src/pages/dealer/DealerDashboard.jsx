@@ -1,117 +1,14 @@
-// import { Link } from "react-router-dom";
-// import { Package, Clock, Inbox, TrendingUp, ArrowRight, PlusCircle } from "lucide-react";
-// import { Button } from "../../components/ui/button";
-// import StatusBadge from "../../components/StatusBadge";
-// import { VEHICLES, LEADS, STATS } from "../../data/mockData";
 
-// const Stat = ({ icon: Icon, label, value, tone = "emerald" }) => (
-//   <div className="rounded-xl border border-slate-200 bg-white p-4">
-//     <div className="flex items-center gap-2">
-//       <span className={`flex h-8 w-8 items-center justify-center rounded-md bg-${tone}-50 text-${tone}-700`}>
-//         <Icon className="h-4 w-4" />
-//       </span>
-//       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{label}</p>
-//     </div>
-//     <p className="mt-3 font-display text-3xl font-bold">{value}</p>
-//   </div>
-// );
-
-// export default function DealerDashboard() {
-//   const myVehicles = VEHICLES.filter((v) => v.dealerId === "d-101");
-//   const myLeads = LEADS.slice(0, 3);
-
-//   return (
-//     <div data-testid="dealer-dashboard" className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-//       <div className="flex flex-wrap items-center justify-between gap-3">
-//         <div>
-//           <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">Dealer dashboard</p>
-//           <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Welcome back, GreenDrive</h1>
-//         </div>
-//         <Link to="/dealer/add-vehicle">
-//           <Button data-testid="dealer-add-cta" className="bg-emerald-700 text-white hover:bg-emerald-800">
-//             <PlusCircle className="mr-2 h-4 w-4" /> Add vehicle
-//           </Button>
-//         </Link>
-//       </div>
-
-//       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-//         <Stat icon={Package} label="Live listings" value={STATS.dealer.liveListings} />
-//         <Stat icon={Clock} label="Pending review" value={STATS.dealer.pendingListings} tone="amber" />
-//         <Stat icon={Inbox} label="New inquiries" value={STATS.dealer.newInquiries} tone="blue" />
-//         <Stat icon={TrendingUp} label="Converted" value={STATS.dealer.converted} />
-//       </div>
-
-//       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-//         <section className="rounded-xl border border-slate-200 bg-white p-5">
-//           <div className="flex items-center justify-between">
-//             <h2 className="font-display text-lg font-bold">Your recent listings</h2>
-//             <Link to="/dealer/listings" className="text-xs font-bold text-emerald-700 hover:underline" data-testid="dealer-see-listings">
-//               See all →
-//             </Link>
-//           </div>
-//           <div className="mt-4 space-y-3">
-//             {myVehicles.slice(0, 4).map((v) => (
-//               <div key={v.id} data-testid={`dealer-listing-${v.id}`} className="flex items-center gap-3 rounded-md border border-slate-100 p-3">
-//                 <img src={v.image} alt="" className="h-14 w-14 rounded object-cover" />
-//                 <div className="min-w-0 flex-1">
-//                   <p className="truncate text-sm font-semibold">{v.brand} {v.model}</p>
-//                   <p className="text-xs text-slate-500">₹{v.monthlyRent.toLocaleString("en-IN")}/mo · {v.quantity} units</p>
-//                 </div>
-//                 <StatusBadge status={v.status} />
-//               </div>
-//             ))}
-//             {myVehicles.length === 0 && (
-//               <p className="rounded-md border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-//                 No listings yet. Add your first vehicle.
-//               </p>
-//             )}
-//           </div>
-//         </section>
-
-//         <section className="rounded-xl border border-slate-200 bg-white p-5">
-//           <div className="flex items-center justify-between">
-//             <h2 className="font-display text-lg font-bold">Recent inquiries</h2>
-//             <Link to="/dealer/inquiries" className="text-xs font-bold text-emerald-700 hover:underline" data-testid="dealer-see-inquiries">
-//               See all →
-//             </Link>
-//           </div>
-//           <div className="mt-4 space-y-3">
-//             {myLeads.map((l) => (
-//               <div key={l.id} data-testid={`dealer-lead-${l.id}`} className="rounded-md border border-slate-100 p-3">
-//                 <div className="flex items-start justify-between gap-2">
-//                   <div>
-//                     <p className="text-sm font-semibold">{l.company}</p>
-//                     <p className="text-xs text-slate-500">{l.contact} · {l.vehiclesNeeded} × {l.preferredType} · {l.budget}</p>
-//                   </div>
-//                   <StatusBadge status={l.stage} />
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </section>
-//       </div>
-
-//       <section className="mt-8 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-//         <div className="flex items-center justify-between gap-4">
-//           <div>
-//             <h3 className="font-display text-lg font-bold">Grow your fleet visibility</h3>
-//             <p className="mt-1 text-sm text-slate-700">Listings with 5+ photos get 3× more inquiries.</p>
-//           </div>
-//           <Link to="/dealer/add-vehicle">
-//             <Button data-testid="dealer-grow-cta" className="bg-emerald-700 text-white hover:bg-emerald-800">
-//               Add listing <ArrowRight className="ml-2 h-4 w-4" />
-//             </Button>
-//           </Link>
-//         </div>
-//       </section>
-//     </div>
-//   );
-// }
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Package, Clock, Inbox, TrendingUp, ArrowRight, PlusCircle } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import StatusBadge from "../../components/StatusBadge";
-import { VEHICLES, LEADS, STATS } from "../../data/mockData";
+import { LEADS, STATS } from "../../data/mockData";
+import { getDealerById, getDealerStats, getVehicles, updateDealer } from "../../lib/api";
+import { toast } from "sonner";
 import {
   ELECTRIC_CYAN,
   ENTERPRISE_CHARCOAL,
@@ -181,8 +78,113 @@ const seeAllLink = {
 };
 
 export default function DealerDashboard() {
-  const myVehicles = VEHICLES.filter((v) => v.dealerId === "d-101");
+  const [dealer, setDealer] = useState(null);
+  const [dealerError, setDealerError] = useState("");
+  const [stats, setStats] = useState(null);
+  const [statsError, setStatsError] = useState("");
+  const [vehicles, setVehicles] = useState([]);
+  const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
+  const [vehiclesError, setVehiclesError] = useState("");
+  const [profileForm, setProfileForm] = useState({
+    dealership: "",
+    contact: "",
+    mobile: "",
+    email: "",
+    city: "",
+    gst: "",
+    pan: "",
+    address: "",
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
   const myLeads = LEADS.slice(0, 3);
+
+  useEffect(() => {
+    let ignore = false;
+    const dealerId = localStorage.getItem("zevgrid_dealer_id");
+
+    async function loadAll() {
+      setIsLoadingVehicles(true);
+
+      try {
+        const [dealerResult, statsResult, vehiclesResult] = await Promise.all([
+          getDealerById(dealerId),
+          getDealerStats(dealerId),
+          getVehicles({ dealerId }),
+        ]);
+
+        if (!ignore) {
+          // Dealer profile
+          setDealer(dealerResult.data);
+          setProfileForm({
+            dealership: dealerResult.data.dealership || "",
+            contact:    dealerResult.data.contact    || "",
+            mobile:     dealerResult.data.mobile     || "",
+            email:      dealerResult.data.email      || "",
+            city:       dealerResult.data.city       || "",
+            gst:        dealerResult.data.gst        || "",
+            pan:        dealerResult.data.pan        || "",
+            address:    dealerResult.data.address    || "",
+          });
+
+          // Stats
+          setStats(statsResult.data);
+
+          // Vehicles — already scoped to this dealer by the API
+          setVehicles(vehiclesResult.data);
+        }
+      } catch (error) {
+        if (!ignore) {
+          const msg = error.message || "Could not load data.";
+          setDealerError(msg);
+          setStatsError(msg);
+          setVehiclesError(msg);
+        }
+      } finally {
+        if (!ignore) setIsLoadingVehicles(false);
+      }
+    }
+
+    if (dealerId) loadAll();
+    return () => { ignore = true; };
+  }, []);
+
+  const updateProfileField = (field, value) =>
+    setProfileForm((curr) => ({ ...curr, [field]: value }));
+
+  const saveProfile = async () => {
+    const dealerId = dealer?.id || localStorage.getItem("zevgrid_dealer_id");
+
+    if (!dealerId) {
+      toast.error("Dealer profile unavailable", {
+        description: "Register or sign in as a dealer before updating profile details.",
+      });
+      return;
+    }
+
+    setIsSavingProfile(true);
+    try {
+      const result = await updateDealer(dealerId, profileForm);
+      setDealer(result.data);
+      setProfileForm({
+        dealership: result.data.dealership || "",
+        contact:    result.data.contact    || "",
+        mobile:     result.data.mobile     || "",
+        email:      result.data.email      || "",
+        city:       result.data.city       || "",
+        gst:        result.data.gst        || "",
+        pan:        result.data.pan        || "",
+        address:    result.data.address    || "",
+      });
+      toast.success(result.message || "Dealer profile updated");
+    } catch (error) {
+      toast.error("Profile update failed", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   return (
     <div
@@ -203,8 +205,19 @@ export default function DealerDashboard() {
             Dealer dashboard
           </p>
           <h1 style={{ marginTop: "0.25rem", fontSize: "1.75rem", fontWeight: 700, color: ENTERPRISE_CHARCOAL }}>
-            Welcome back, GreenDrive
+            Welcome back, {dealer?.dealership || "Dealer"}
           </h1>
+          <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+            {dealer?.status && <StatusBadge status={dealer.status} />}
+            {dealer && (
+              <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                {dealer.city} · {dealer.mobile}
+              </span>
+            )}
+            {!dealer && dealerError && (
+              <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>{dealerError}</span>
+            )}
+          </div>
         </div>
         <Link to="/dealer/add-vehicle">
           <Button
@@ -240,11 +253,14 @@ export default function DealerDashboard() {
         }}
         className="md:grid-cols-4"
       >
-        <Stat icon={Package}   label="Live listings"   value={STATS.dealer.liveListings}   tone="emerald" />
-        <Stat icon={Clock}     label="Pending review"  value={STATS.dealer.pendingListings} tone="amber" />
-        <Stat icon={Inbox}     label="New inquiries"   value={STATS.dealer.newInquiries}    tone="blue" />
-        <Stat icon={TrendingUp} label="Converted"      value={STATS.dealer.converted}       tone="cyan" />
+        <Stat icon={Package}    label="Live listings"  value={stats?.vehicles.live      ?? STATS.dealer.liveListings}    tone="emerald" />
+        <Stat icon={Clock}      label="Total vehicles"  value={stats?.vehicles.total     ?? STATS.dealer.pendingListings}  tone="amber"   />
+        <Stat icon={Inbox}      label="New inquiries"  value={stats?.leads.new          ?? STATS.dealer.newInquiries}     tone="blue"    />
+        <Stat icon={TrendingUp} label="Converted"      value={stats?.leads.converted    ?? STATS.dealer.converted}        tone="cyan"    />
       </div>
+      {statsError && (
+        <p style={{ marginTop: "0.75rem", fontSize: "0.8125rem", color: "#64748B" }}>{statsError}</p>
+      )}
 
       {/* Two-column sections */}
       <div
@@ -268,7 +284,15 @@ export default function DealerDashboard() {
             </Link>
           </div>
           <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {myVehicles.slice(0, 4).map((v) => (
+            {isLoadingVehicles && (
+              <p style={{ fontSize: "0.875rem", color: "#94A3B8", textAlign: "center", padding: "1rem 0" }}>
+                Loading listings…
+              </p>
+            )}
+            {!isLoadingVehicles && vehiclesError && (
+              <p style={{ fontSize: "0.875rem", color: "#64748B" }}>{vehiclesError}</p>
+            )}
+            {!isLoadingVehicles && !vehiclesError && vehicles.slice(0, 4).map((v) => (
               <div
                 key={v.id}
                 data-testid={`dealer-listing-${v.id}`}
@@ -293,7 +317,7 @@ export default function DealerDashboard() {
                 <StatusBadge status={v.status} />
               </div>
             ))}
-            {myVehicles.length === 0 && (
+            {!isLoadingVehicles && !vehiclesError && vehicles.length === 0 && (
               <p
                 style={{
                   borderRadius: "0.375rem",
@@ -351,6 +375,73 @@ export default function DealerDashboard() {
           </div>
         </section>
       </div>
+
+      {/* Dealer profile form */}
+      <section
+        style={{
+          marginTop: "2rem",
+          borderRadius: "0.75rem",
+          border: "1px solid #E2E8F0",
+          backgroundColor: CLEAN_WHITE,
+          padding: "1.25rem",
+        }}
+      >
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" }}>
+          <div>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: ENTERPRISE_CHARCOAL }}>Dealer profile</h2>
+            <p style={{ marginTop: "0.25rem", fontSize: "0.8125rem", color: "#64748B" }}>
+              Keep dealership and contact details current for admin verification.
+            </p>
+          </div>
+          <Button
+            data-testid="dealer-profile-save"
+            onClick={saveProfile}
+            disabled={isSavingProfile}
+            style={{
+              backgroundColor: ACTIVE_EMERALD,
+              color: CLEAN_WHITE,
+              border: "none",
+              fontWeight: 700,
+              borderRadius: "0.5rem",
+              cursor: "pointer",
+              padding: "0 1rem",
+              height: "2.5rem",
+            }}
+          >
+            {isSavingProfile ? "Saving..." : "Save profile"}
+          </Button>
+        </div>
+
+        <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+          {[
+            ["dealership", "Dealership"],
+            ["contact",    "Contact person"],
+            ["mobile",     "Mobile"],
+            ["email",      "Email"],
+            ["city",       "City"],
+            ["gst",        "GST"],
+            ["pan",        "PAN"],
+            ["address",    "Address"],
+          ].map(([field, label]) => (
+            <div key={field}>
+              <Label>{label}</Label>
+              <Input
+                data-testid={`dealer-profile-${field}`}
+                value={profileForm[field]}
+                onChange={(e) => updateProfileField(field, e.target.value)}
+                disabled={isSavingProfile}
+                style={{
+                  marginTop: "0.375rem",
+                  height: "2.75rem",
+                  border: `1px solid ${ELECTRIC_CYAN}33`,
+                  borderRadius: "0.5rem",
+                  color: ENTERPRISE_CHARCOAL,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* CTA banner */}
       <section
